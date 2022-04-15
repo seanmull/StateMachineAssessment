@@ -1,7 +1,6 @@
 import logging
 import string
 from os import getcwd
-from pprint import pprint
 from random import sample
 from subprocess import run
 
@@ -12,13 +11,13 @@ app = Flask(__name__)
 logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
 
-def select_three_nodes_at_random(src):
+def select_three_nodes_at_random(src) -> list:
     nodes_to_pick_from = set(string.ascii_uppercase)
     nodes_to_pick_from.remove(src)
     return sample(nodes_to_pick_from, 3)
 
 
-def build_graph():
+def build_graph() -> dict:
     nodes = list(string.ascii_uppercase)
     nodes.remove("Z")
     graph = {"Z": ["A"]}
@@ -36,8 +35,8 @@ class graph_client:
     def __str__(self) -> str:
         return str({"current_node": self.current_node, "graph": self.graph})
 
-    def create_graph_visualization(self):
-        def parse_graph_for_dot_format(self):
+    def create_graph_visualization(self) -> None:
+        def parse_graph_for_dot_format(self) -> str:
             s = ""
             for src, dest in self.graph.items():
                 if src == "Z":
@@ -54,8 +53,8 @@ class graph_client:
         )
         run(command, shell=True)
 
-    def traverse_graph(self, picked_path):
-        def validate_path(picked_path):
+    def traverse_graph(self, picked_path) -> None:
+        def validate_path(picked_path) -> bool:
             try:
                 path_choice = int(picked_path) - 1
             except ValueError:
@@ -79,17 +78,21 @@ class graph_client:
             logging.info(
                 "The old node was {current_node}".format(current_node=self.current_node)
             )
-            if self.current_node == "Z":
-                self.current_node == "A"
-            else:
-                self.current_node = self.graph[self.current_node][int(picked_path) - 1]
+            self.current_node = self.graph[self.current_node][int(picked_path) - 1]
             logging.info(
                 "The new node is {current_node}".format(current_node=self.current_node)
             )
+            if self.current_node == "Z":
+                self.current_node == "A"
+                logging.info(
+                    "The new node is {current_node}".format(
+                        current_node=self.current_node
+                    )
+                )
 
 
 @app.route("/path/<int:path_number>")
-def get_updated_node(path_number):
+def get_updated_node(path_number) -> str:
     cl.traverse_graph(path_number)
     return cl.__str__()
 
